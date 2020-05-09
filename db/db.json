@@ -1,0 +1,23 @@
+{
+  "songs": [
+    {
+      "title": "json-server",
+      "artist": "typicode"
+    },
+    {
+      "id": 2,
+      "title": "json-server2",
+      "artist": "typicod22e"
+    },
+    {
+      "title": "json-server2",
+      "artist": "typicod22e",
+      "id": 3
+    },
+    {
+      "title": "asdasd",
+      "artist": "asdasda",
+      "id": 4
+    }
+  ]
+}
