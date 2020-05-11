@@ -3,8 +3,13 @@ module Main exposing (..)
 -- import Html.Attributes exposing (onChange)
 
 import Browser
-import Html exposing (..)
-import Html.Attributes exposing (placeholder)
+import Element exposing (..)
+import Element.Background as Background
+import Element.Border as Border
+import Element.Font as Font
+import Element.Input as Input
+import Html exposing (Html)
+import Html.Attributes exposing (placeholder, style)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Song exposing (..)
@@ -141,47 +146,53 @@ update msg model =
 
 
 
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
-
-
-
 -- VIEW
 
 
 view : Model -> Html Msg
 view model =
-    case model.status of
-        Failure message ->
-            div [] [ text ("Problem!: " ++ errorToString message) ]
+    layout [ padding 80 ] <|
+        case model.status of
+            Failure message ->
+                el [] (text ("Problem!: " ++ errorToString message))
 
-        Loading ->
-            div [] [ text "Loading..." ]
+            Loading ->
+                el [] (text "Loading...")
 
-        Success songsList ->
-            div []
-                [ div []
-                    [ input [ placeholder "Title", onInput UpdateTitle ] []
-                    , input [ placeholder "Artist", onInput UpdateArtist ] []
-                    , button [ onClick AddNewSong ] [ text "add song" ]
+            Success songsList ->
+                column []
+                    [ row [ width fill, centerY, spacing 30 ]
+                        [ Input.text []
+                            { onChange = UpdateTitle
+                            , text = model.currentSong.title
+                            , placeholder = Just <| Input.placeholder [] <| text "Title"
+                            , label = Input.labelAbove [] <| text "Song Title"
+                            }
+                        , Input.text []
+                            { onChange = UpdateArtist
+                            , text = model.currentSong.artist
+                            , placeholder = Just <| Input.placeholder [] <| text "Artist"
+                            , label = Input.labelAbove [] <| text "Song Artist"
+                            }
+                        , Input.button
+                            [ padding 20
+                            , Border.width 2
+                            , Border.rounded 16
+                            , Border.color <| rgb255 0x50 0x50 0x50
+                            , Border.shadow { offset = ( 4, 4 ), size = 3, blur = 10, color = rgb255 0xD0 0xD0 0xD0 }
+                            , Background.color <| rgb255 114 159 207
+                            , Font.color <| rgb255 0xFF 0xFF 0xFF
+                            , mouseOver
+                                [ Background.color <| rgb255 0xFF 0xFF 0xFF, Font.color <| rgb255 0 0 0 ]
+                            , focused
+                                [ Border.shadow { offset = ( 4, 4 ), size = 3, blur = 10, color = rgb255 114 159 207 } ]
+                            ]
+                            { onPress = Just AddNewSong
+                            , label = text "Add"
+                            }
+                        ]
+                    , viewAllSongs songsList
                     ]
-                , div []
-                    (viewAllSongs songsList)
-                ]
-
-
-viewAllSongs : List Song -> List (Html Msg)
-viewAllSongs list =
-    List.map viewSong list
-
-
-viewSong : Song -> Html Msg
-viewSong song =
-    div [] [ text song.title ]
 
 
 main : Program () Model Msg
@@ -190,5 +201,5 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = subscriptions
+        , subscriptions = \_ -> Sub.none
         }
