@@ -1,33 +1,22 @@
 {
   "songs": [
     {
-      "title": "json-server",
-      "artist": "typicode"
+      "id": 1,
+      "title": "Thriller",
+      "artist": "M Jackson",
+      "bpm": "110.00"
     },
     {
-      "id": 2,
-      "title": "json-server2",
-      "artist": "typicod22e"
+      "title": "Les Sardines",
+      "artist": "P Sebastien",
+      "bpm": "156.00",
+      "id": 2
     },
     {
-      "title": "json-server2",
-      "artist": "typicod22e",
+      "title": "Feelings for U",
+      "artist": "Cassius",
+      "bpm": "125.00",
       "id": 3
-    },
-    {
-      "title": "asdasd",
-      "artist": "asdasda",
-      "id": 4
-    },
-    {
-      "title": "dgffdg",
-      "artist": "dfgfdgd",
-      "id": 5
-    },
-    {
-      "title": "sdfsdf",
-      "artist": "sdfsff",
-      "id": 6
     }
   ]
 }

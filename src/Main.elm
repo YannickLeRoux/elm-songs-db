@@ -34,7 +34,7 @@ initState : Model
 initState =
     { status = Loading
     , listOfSongs = []
-    , currentSong = Song "" ""
+    , currentSong = Song "" "" ""
     }
 
 
@@ -72,6 +72,7 @@ type Msg
     | PostSongResponse (Result Http.Error Song)
     | UpdateTitle String
     | UpdateArtist String
+    | UpdateBPM String
     | AddNewSong
 
 
@@ -86,6 +87,9 @@ errorToString err =
 
         Http.BadUrl url ->
             "Malformed url: " ++ url
+
+        Http.BadStatus status ->
+            "Returning " ++ String.fromInt status ++ " status"
 
         _ ->
             "Well I dont know what error is this!"
@@ -103,6 +107,11 @@ updateSongTitle str ({ currentSong } as model) =
 updateSongArtist : String -> Model -> Model
 updateSongArtist str ({ currentSong } as model) =
     { model | currentSong = { currentSong | artist = str } }
+
+
+updateSongTempo : String -> Model -> Model
+updateSongTempo str ({ currentSong } as model) =
+    { model | currentSong = { currentSong | bpm = str } }
 
 
 
@@ -135,8 +144,11 @@ update msg model =
         UpdateArtist title ->
             ( updateSongArtist title model, Cmd.none )
 
+        UpdateBPM tempo ->
+            ( updateSongTempo tempo model, Cmd.none )
+
         AddNewSong ->
-            ( model
+            ( { model | currentSong = Song "" "" "" }
             , Http.post
                 { url = "http://localhost:3000/songs"
                 , body = Http.jsonBody (encodeSong model.currentSong)
@@ -173,6 +185,12 @@ view model =
                             , text = model.currentSong.artist
                             , placeholder = Just <| Input.placeholder [] <| text "Artist"
                             , label = Input.labelAbove [] <| text "Song Artist"
+                            }
+                        , Input.text []
+                            { onChange = UpdateBPM
+                            , text = model.currentSong.bpm
+                            , placeholder = Just <| Input.placeholder [] <| text "100.00"
+                            , label = Input.labelAbove [] <| text "Song BPM"
                             }
                         , Input.button
                             [ padding 20

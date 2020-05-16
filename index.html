@@ -10728,9 +10728,9 @@ var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$GotAllSongs = function (a) {
 	return {$: 'GotAllSongs', a: a};
 };
-var $author$project$Song$Song = F2(
-	function (title, artist) {
-		return {artist: artist, title: title};
+var $author$project$Song$Song = F3(
+	function (title, artist, bpm) {
+		return {artist: artist, bpm: bpm, title: title};
 	});
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
@@ -10742,13 +10742,17 @@ var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 	});
 var $author$project$Song$decodeSong = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'artist',
+	'bpm',
 	$elm$json$Json$Decode$string,
 	A3(
 		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'title',
+		'artist',
 		$elm$json$Json$Decode$string,
-		$elm$json$Json$Decode$succeed($author$project$Song$Song)));
+		A3(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+			'title',
+			$elm$json$Json$Decode$string,
+			$elm$json$Json$Decode$succeed($author$project$Song$Song))));
 var $author$project$Song$decodeAllSongs = $elm$json$Json$Decode$list($author$project$Song$decodeSong);
 var $elm$http$Http$BadStatus_ = F2(
 	function (a, b) {
@@ -11005,7 +11009,7 @@ var $author$project$Main$getAllSongs = $elm$http$Http$get(
 	});
 var $author$project$Main$Loading = {$: 'Loading'};
 var $author$project$Main$initState = {
-	currentSong: A2($author$project$Song$Song, '', ''),
+	currentSong: A3($author$project$Song$Song, '', '', ''),
 	listOfSongs: _List_Nil,
 	status: $author$project$Main$Loading
 };
@@ -11032,7 +11036,10 @@ var $author$project$Song$encodeSong = function (sg) {
 				$elm$json$Json$Encode$string(sg.title)),
 				_Utils_Tuple2(
 				'artist',
-				$elm$json$Json$Encode$string(sg.artist))
+				$elm$json$Json$Encode$string(sg.artist)),
+				_Utils_Tuple2(
+				'bpm',
+				$elm$json$Json$Encode$string(sg.bpm))
 			]));
 };
 var $elm$http$Http$jsonBody = function (value) {
@@ -11054,6 +11061,17 @@ var $author$project$Main$updateSongArtist = F2(
 				currentSong: _Utils_update(
 					currentSong,
 					{artist: str})
+			});
+	});
+var $author$project$Main$updateSongTempo = F2(
+	function (str, model) {
+		var currentSong = model.currentSong;
+		return _Utils_update(
+			model,
+			{
+				currentSong: _Utils_update(
+					currentSong,
+					{bpm: str})
 			});
 	});
 var $author$project$Main$updateSongTitle = F2(
@@ -11115,9 +11133,18 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Main$updateSongArtist, title, model),
 					$elm$core$Platform$Cmd$none);
+			case 'UpdateBPM':
+				var tempo = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$updateSongTempo, tempo, model),
+					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
-					model,
+					_Utils_update(
+						model,
+						{
+							currentSong: A3($author$project$Song$Song, '', '', '')
+						}),
 					$elm$http$Http$post(
 						{
 							body: $elm$http$Http$jsonBody(
@@ -11130,6 +11157,9 @@ var $author$project$Main$update = F2(
 var $author$project$Main$AddNewSong = {$: 'AddNewSong'};
 var $author$project$Main$UpdateArtist = function (a) {
 	return {$: 'UpdateArtist', a: a};
+};
+var $author$project$Main$UpdateBPM = function (a) {
+	return {$: 'UpdateBPM', a: a};
 };
 var $author$project$Main$UpdateTitle = function (a) {
 	return {$: 'UpdateTitle', a: a};
@@ -16663,6 +16693,9 @@ var $author$project$Main$errorToString = function (err) {
 		case 'BadUrl':
 			var url = err.a;
 			return 'Malformed url: ' + url;
+		case 'BadStatus':
+			var status = err.a;
+			return 'Returning ' + ($elm$core$String$fromInt(status) + ' status');
 		default:
 			return 'Well I dont know what error is this!';
 	}
@@ -18320,6 +18353,13 @@ var $author$project$Song$viewAllSongs = function (list) {
 						return $author$project$Song$tableRow(song.artist);
 					},
 					width: $mdgriffith$elm_ui$Element$fill
+				},
+					{
+					header: $author$project$Song$tableHeader('BPM'),
+					view: function (song) {
+						return $author$project$Song$tableRow(song.bpm);
+					},
+					width: $mdgriffith$elm_ui$Element$fill
 				}
 				]),
 			data: list
@@ -18397,6 +18437,22 @@ var $author$project$Main$view = function (model) {
 											text: model.currentSong.artist
 										}),
 										A2(
+										$mdgriffith$elm_ui$Element$Input$text,
+										_List_Nil,
+										{
+											label: A2(
+												$mdgriffith$elm_ui$Element$Input$labelAbove,
+												_List_Nil,
+												$mdgriffith$elm_ui$Element$text('Song BPM')),
+											onChange: $author$project$Main$UpdateBPM,
+											placeholder: $elm$core$Maybe$Just(
+												A2(
+													$mdgriffith$elm_ui$Element$Input$placeholder,
+													_List_Nil,
+													$mdgriffith$elm_ui$Element$text('100.00'))),
+											text: model.currentSong.bpm
+										}),
+										A2(
 										$mdgriffith$elm_ui$Element$Input$button,
 										_List_fromArray(
 											[
@@ -18456,7 +18512,7 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 		view: $author$project$Main$view
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Song.Song":{"args":[],"type":"{ title : String.String, artist : String.String }"}},"unions":{"Main.Msg":{"args":[],"tags":{"GotAllSongs":["Result.Result Http.Error (List.List Song.Song)"],"PostSongResponse":["Result.Result Http.Error Song.Song"],"UpdateTitle":["String.String"],"UpdateArtist":["String.String"],"AddNewSong":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"String.String":{"args":[],"tags":{"String":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{"Song.Song":{"args":[],"type":"{ title : String.String, artist : String.String, bpm : String.String }"}},"unions":{"Main.Msg":{"args":[],"tags":{"GotAllSongs":["Result.Result Http.Error (List.List Song.Song)"],"PostSongResponse":["Result.Result Http.Error Song.Song"],"UpdateTitle":["String.String"],"UpdateArtist":["String.String"],"UpdateBPM":["String.String"],"AddNewSong":[]}},"Http.Error":{"args":[],"tags":{"BadUrl":["String.String"],"Timeout":[],"NetworkError":[],"BadStatus":["Basics.Int"],"BadBody":["String.String"]}},"List.List":{"args":["a"],"tags":{}},"Result.Result":{"args":["error","value"],"tags":{"Ok":["value"],"Err":["error"]}},"String.String":{"args":[],"tags":{"String":[]}},"Basics.Int":{"args":[],"tags":{"Int":[]}}}}})}});}(this));
 
   var app = Elm.Main.init({ node: document.getElementById("elm") });
 }

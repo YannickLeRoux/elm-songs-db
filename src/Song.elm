@@ -6,7 +6,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
-import Json.Decode as Decode exposing (Decoder, int, string)
+import Json.Decode as Decode exposing (Decoder, float, int, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
 
@@ -18,6 +18,7 @@ import Json.Encode as Encode
 type alias Song =
     { title : String
     , artist : String
+    , bpm : String
     }
 
 
@@ -30,6 +31,7 @@ decodeSong =
     Decode.succeed Song
         |> required "title" string
         |> required "artist" string
+        |> required "bpm" string
 
 
 encodeSong : Song -> Encode.Value
@@ -37,6 +39,7 @@ encodeSong sg =
     Encode.object
         [ ( "title", Encode.string sg.title )
         , ( "artist", Encode.string sg.artist )
+        , ( "bpm", Encode.string sg.bpm )
         ]
 
 
@@ -49,6 +52,7 @@ decodeAllSongs =
 -- VIEW
 
 
+tableHeader : String -> Element msg
 tableHeader str =
     el [ Background.color <| rgb255 114 159 207, paddingEach edges, Font.color <| rgb255 0xFF 0xFF 0xFF ] (text str)
 
@@ -81,6 +85,12 @@ viewAllSongs list =
               , view =
                     \song ->
                         tableRow song.artist
+              }
+            , { header = tableHeader "BPM"
+              , width = fill
+              , view =
+                    \song ->
+                        tableRow song.bpm
               }
             ]
         }
