@@ -1,11 +1,13 @@
-module Song exposing (Song, decodeAllSongs, decodeSong, encodeSong, viewAllSongs)
+module Song exposing (Song, SongId, decodeAllSongs, decodeSong, encodeSong, viewAllSongs, idToSring)
 
+import Browser
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
+import Http
 import Json.Decode as Decode exposing (Decoder, int, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
@@ -15,10 +17,47 @@ import Json.Encode as Encode
 -- MODEL
 
 
+init : () -> ( Song, Cmd Msg )
+init _ =
+    ( Song 0 "" "", Cmd.none )
+
+
 type alias Song =
-    { title : String
+    { id : SongId
+    , title : String
     , artist : String
     }
+
+
+type SongId
+    = SongId Int
+
+
+
+-- UPDATE
+
+
+type Msg
+    = DeleteSong Int
+
+
+update : Msg -> Song -> ( Song, Cmd Msg )
+update msg model =
+    case msg of
+        -- DeleteSong id ->
+        --     ( model
+        --     , Http.request
+        --         { method = "DELETE"
+        --         , headers = []
+        --         , url = "http://localhost:3000/songs/" ++ id
+        --         , body = Http.emptyBody
+        --         , expect = Http.expectJson PostSongResponse decodeSong
+        --         , timeout = Nothing
+        --         , tracker = Nothing
+        --         }
+        --     )
+        _ ->
+            ( model, Cmd.none )
 
 
 
@@ -28,6 +67,7 @@ type alias Song =
 decodeSong : Decoder Song
 decodeSong =
     Decode.succeed Song
+        |> required 'id' idDecoder
         |> required "title" string
         |> required "artist" string
 
@@ -45,6 +85,17 @@ decodeAllSongs =
     Decode.list decodeSong
 
 
+-- Decode the id that is int in json to a SongId
+idDecoder : Decoder PostId
+idDecoder =
+    Decode.map SongId int
+
+
+-- HELPER FUNCTIONS
+
+idToString: SongId -> String;
+idToSring (SongId id) =
+    String.fromInt id
 
 -- VIEW
 
@@ -82,5 +133,27 @@ viewAllSongs list =
                     \song ->
                         tableRow song.artist
               }
+            , { header = tableHeader "Delete"
+              , width = fill
+              , view =
+                    \song ->
+                        tableRow song.artist
+
+              -- Input.button []
+              --     { onPress = DeleteSong song.id
+              --     , label = text "X"
+              --     }
+              }
             ]
         }
+
+
+
+-- main : Program () Song Msg
+-- main =
+--     Browser.element
+--         { init = init
+--         , view = viewAllSongs
+--         , update = update
+--         , subscriptions = \_ -> Sub.none
+--         }
