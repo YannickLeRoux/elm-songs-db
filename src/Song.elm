@@ -26,6 +26,7 @@ type alias Song =
     { id : SongId
     , title : String
     , artist : String
+    , bpm : String
     }
 
 
@@ -70,6 +71,7 @@ decodeSong =
         |> required 'id' idDecoder
         |> required "title" string
         |> required "artist" string
+        |> required "bpm" string
 
 
 encodeSong : Song -> Encode.Value
@@ -77,6 +79,7 @@ encodeSong sg =
     Encode.object
         [ ( "title", Encode.string sg.title )
         , ( "artist", Encode.string sg.artist )
+        , ( "bpm", Encode.string sg.bpm )
         ]
 
 
@@ -100,6 +103,7 @@ idToSring (SongId id) =
 -- VIEW
 
 
+tableHeader : String -> Element msg
 tableHeader str =
     el [ Background.color <| rgb255 114 159 207, paddingEach edges, Font.color <| rgb255 0xFF 0xFF 0xFF ] (text str)
 
