@@ -16,10 +16,23 @@ import Json.Encode as Encode
 
 
 type alias Song =
-    { title : String
+    { id : PostId
+    , title : String
     , artist : String
     , bpm : String
     }
+
+
+type PostId
+    = PostId Int
+
+
+
+-- UPDATE
+
+
+type Msg
+    = DeletePost PostId
 
 
 
@@ -29,6 +42,7 @@ type alias Song =
 decodeSong : Decoder Song
 decodeSong =
     Decode.succeed Song
+        |> required "id" int
         |> required "title" string
         |> required "artist" string
         |> required "bpm" string
@@ -91,6 +105,12 @@ viewAllSongs list =
               , view =
                     \song ->
                         tableRow song.bpm
+              }
+            , { header = tableHeader "Delete"
+              , width = fill
+              , view =
+                    \song ->
+                        button [ paddingEach edges onClick DeleteSong song.id ] (text "X")
               }
             ]
         }

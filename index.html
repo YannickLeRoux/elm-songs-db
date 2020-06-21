@@ -18076,6 +18076,7 @@ var $mdgriffith$elm_ui$Element$Input$text = $mdgriffith$elm_ui$Element$Input$tex
 		spellchecked: false,
 		type_: $mdgriffith$elm_ui$Element$Input$TextInputNode('text')
 	});
+var $author$project$Song$edges = {bottom: 15, left: 15, right: 0, top: 15};
 var $mdgriffith$elm_ui$Element$InternalColumn = function (a) {
 	return {$: 'InternalColumn', a: a};
 };
@@ -18304,7 +18305,6 @@ var $mdgriffith$elm_ui$Element$table = F2(
 				data: config.data
 			});
 	});
-var $author$project$Song$edges = {bottom: 15, left: 15, right: 0, top: 15};
 var $author$project$Song$tableHeader = function (str) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
@@ -18358,6 +18358,19 @@ var $author$project$Song$viewAllSongs = function (list) {
 					header: $author$project$Song$tableHeader('BPM'),
 					view: function (song) {
 						return $author$project$Song$tableRow(song.bpm);
+					},
+					width: $mdgriffith$elm_ui$Element$fill
+				},
+					{
+					header: $author$project$Song$tableHeader('Delete'),
+					view: function (_v0) {
+						return A2(
+							$mdgriffith$elm_ui$Element$el,
+							_List_fromArray(
+								[
+									$mdgriffith$elm_ui$Element$paddingEach($author$project$Song$edges)
+								]),
+							$mdgriffith$elm_ui$Element$text('X'));
 					},
 					width: $mdgriffith$elm_ui$Element$fill
 				}

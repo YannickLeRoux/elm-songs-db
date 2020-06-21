@@ -17,6 +17,12 @@
       "artist": "Cassius",
       "bpm": "125.00",
       "id": 3
+    },
+    {
+      "title": "World Hold On",
+      "artist": "Bob Sinclar",
+      "bpm": "126.00",
+      "id": 4
     }
   ]
 }

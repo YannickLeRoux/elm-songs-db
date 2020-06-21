@@ -12,7 +12,7 @@ import Html exposing (Html)
 import Html.Attributes exposing (placeholder, style)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Song exposing (..)
+import Song exposing ()
 
 
 
@@ -74,6 +74,7 @@ type Msg
     | UpdateArtist String
     | UpdateBPM String
     | AddNewSong
+    | DeleteSong PostId
 
 
 errorToString : Http.Error -> String
@@ -153,6 +154,19 @@ update msg model =
                 { url = "http://localhost:3000/songs"
                 , body = Http.jsonBody (encodeSong model.currentSong)
                 , expect = Http.expectJson PostSongResponse decodeSong
+                }
+            )
+
+        DeleteSong id ->
+            ( { model | currentSong = Song "" "" "" }
+            , Http.request
+                { method = "DELETE"
+                , headers = []
+                , url = "http://localhost:3000/songs" ++ Post.idToString postId
+                , body = Http.emptyBody
+                , expect = Http.expectString PostDeleted
+                , timeout = Nothing
+                , tracker = Nothing
                 }
             )
 
