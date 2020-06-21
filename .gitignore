@@ -1,2 +1,3 @@
-elm-stuff/*
+elm-stuff
 db/node_modules/*
+repl-temp-*

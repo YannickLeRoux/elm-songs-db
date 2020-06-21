@@ -1,12 +1,14 @@
-module Song exposing (Song, decodeAllSongs, decodeSong, encodeSong, viewAllSongs)
+module Song exposing (Song, SongId, decodeAllSongs, decodeSong, encodeSong, viewAllSongs, idToSring)
 
+import Browser
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
-import Json.Decode as Decode exposing (Decoder, float, int, string)
+import Http
+import Json.Decode as Decode exposing (Decoder, int, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
 
@@ -15,16 +17,30 @@ import Json.Encode as Encode
 -- MODEL
 
 
+init : () -> ( Song, Cmd Msg )
+init _ =
+    ( Song 0 "" "", Cmd.none )
+
+
 type alias Song =
+<<<<<<< HEAD
     { id : PostId
+=======
+    { id : SongId
+>>>>>>> 33cb7426151cb512ee9e378a1bfd2c25a8317629
     , title : String
     , artist : String
     , bpm : String
     }
 
 
+<<<<<<< HEAD
 type PostId
     = PostId Int
+=======
+type SongId
+    = SongId Int
+>>>>>>> 33cb7426151cb512ee9e378a1bfd2c25a8317629
 
 
 
@@ -32,7 +48,30 @@ type PostId
 
 
 type Msg
+<<<<<<< HEAD
     = DeletePost PostId
+=======
+    = DeleteSong Int
+
+
+update : Msg -> Song -> ( Song, Cmd Msg )
+update msg model =
+    case msg of
+        -- DeleteSong id ->
+        --     ( model
+        --     , Http.request
+        --         { method = "DELETE"
+        --         , headers = []
+        --         , url = "http://localhost:3000/songs/" ++ id
+        --         , body = Http.emptyBody
+        --         , expect = Http.expectJson PostSongResponse decodeSong
+        --         , timeout = Nothing
+        --         , tracker = Nothing
+        --         }
+        --     )
+        _ ->
+            ( model, Cmd.none )
+>>>>>>> 33cb7426151cb512ee9e378a1bfd2c25a8317629
 
 
 
@@ -42,7 +81,11 @@ type Msg
 decodeSong : Decoder Song
 decodeSong =
     Decode.succeed Song
+<<<<<<< HEAD
         |> required "id" int
+=======
+        |> required 'id' idDecoder
+>>>>>>> 33cb7426151cb512ee9e378a1bfd2c25a8317629
         |> required "title" string
         |> required "artist" string
         |> required "bpm" string
@@ -62,6 +105,17 @@ decodeAllSongs =
     Decode.list decodeSong
 
 
+-- Decode the id that is int in json to a SongId
+idDecoder : Decoder PostId
+idDecoder =
+    Decode.map SongId int
+
+
+-- HELPER FUNCTIONS
+
+idToString: SongId -> String;
+idToSring (SongId id) =
+    String.fromInt id
 
 -- VIEW
 
@@ -100,11 +154,16 @@ viewAllSongs list =
                     \song ->
                         tableRow song.artist
               }
-            , { header = tableHeader "BPM"
+            , { header = tableHeader "Delete"
               , width = fill
               , view =
                     \song ->
-                        tableRow song.bpm
+                        tableRow song.artist
+
+              -- Input.button []
+              --     { onPress = DeleteSong song.id
+              --     , label = text "X"
+              --     }
               }
             , { header = tableHeader "Delete"
               , width = fill
@@ -114,3 +173,14 @@ viewAllSongs list =
               }
             ]
         }
+
+
+
+-- main : Program () Song Msg
+-- main =
+--     Browser.element
+--         { init = init
+--         , view = viewAllSongs
+--         , update = update
+--         , subscriptions = \_ -> Sub.none
+--         }

@@ -3,6 +3,7 @@ module Main exposing (..)
 -- import Html.Attributes exposing (onChange)
 
 import Browser
+import Browser.Navigation as Nav
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
@@ -12,17 +13,54 @@ import Html exposing (Html)
 import Html.Attributes exposing (placeholder, style)
 import Html.Events exposing (onClick, onInput)
 import Http
+<<<<<<< HEAD
 import Song exposing ()
+=======
+import Route exposing (Route)
+import Song exposing (..)
+import Url exposing (Url)
+>>>>>>> 33cb7426151cb512ee9e378a1bfd2c25a8317629
 
 
 
 -- MODEL
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( initState
-    , getAllSongs
+init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url navKey =
+    let
+        model =
+            { status = Loading
+            , listOfSongs = []
+            , currentSong = Song "" ""
+            , page = NotFoundPage
+            , route = Route.parseUrl url
+            , navKey = navKey
+            }
+    in
+    initCurrentPage
+        ( model
+        , getAllSongs
+        )
+
+
+initCurrentPage : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+initCurrentPage ( model, existingCmds ) =
+    let
+        ( currentPage, mappedPageCmds ) =
+            case model.route of
+                Route.NotFound ->
+                    ( NotFoundPage, Cmd.none )
+
+                Route.Songs ->
+                    let
+                        ( pageModel, pageCmds ) =
+                            ListPosts.init
+                    in
+                    ( SongsPage pageModel, Cmd.map ListPageMsg pageCmds )
+    in
+    ( { model | page = currentPage }
+    , Cmd.batch [ existingCmds, mappedPageCmds ]
     )
 
 
@@ -42,7 +80,14 @@ type alias Model =
     { status : Status
     , listOfSongs : List Song
     , currentSong : Song
+    , route : Route
+    , page : Page
     }
+
+
+type Page
+    = NotFoundPage
+    | SongsPage List Song.Model
 
 
 type Status
